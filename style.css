@@ -1,19 +1,30 @@
 
 body {
   font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 20px;
+  transition: background 0.5s, color 0.5s;
   background: linear-gradient(to top, #87cefa, #ffffff);
-  transition: background 0.5s;
+  color: #000;
+}
+
+body.dark-mode {
+  background: #121212;
+  color: #eee;
 }
 
 .container {
   background: white;
+  color: black;
   padding: 20px;
-  max-width: 400px;
+  max-width: 500px;
   margin: auto;
   border-radius: 15px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  transition: background 0.5s, color 0.5s;
+}
+
+body.dark-mode .container {
+  background: #1f1f1f;
+  color: #ddd;
 }
 
 input, button {
@@ -22,8 +33,19 @@ input, button {
   font-size: 16px;
 }
 
+button {
+  cursor: pointer;
+}
+
 #weatherResult img {
   width: 80px;
+}
+
+#map {
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+  border-radius: 10px;
 }
 
 #historyBox ul {
@@ -33,7 +55,12 @@ input, button {
 
 #historyBox li {
   cursor: pointer;
-  color: blue;
+  color: #007BFF;
   margin: 5px 0;
   text-decoration: underline;
+}
+
+.theme-toggle {
+  text-align: right;
+  padding: 10px;
 }

@@ -1,6 +1,6 @@
 
 const apiKey = "5d734ecea5469f4b372578e0252a1a99"; // Replace this
-const mapKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace this
+const mapKey = "AIzaSyBXjR5ta5Y76Sjo14y2lpdizWNNuvouMQg"; // Replace this
 
 document.getElementById('darkModeToggle').addEventListener('change', () => {
   document.body.classList.toggle('dark-mode');

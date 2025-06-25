@@ -1,60 +1,90 @@
+
+const apiKey = "5d734ecea5469f4b372578e0252a1a99"; // Replace with your OpenWeatherMap API key
+
 async function getWeather() {
   const city = document.getElementById("cityInput").value;
-  const apiKey = "5d734ecea5469f4b372578e0252a1a99"; // 🔁 Replace with your actual API key
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+  if (!city) return alert("Please enter a city name.");
 
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
   const response = await fetch(url);
   const data = await response.json();
 
   if (data.cod === 200) {
-    const weatherInfo = `
-      <p>📍 <strong>${data.name}, ${data.sys.country}</strong></p>
-      <p>🌡️ Temperature: ${data.main.temp}°C</p>
-      <p>☁️ Condition: ${data.weather[0].main}</p>
-      <p>💧 Humidity: ${data.main.humidity}%</p>
-      <p>🌬️ Wind Speed: ${data.wind.speed} m/s</p>
-    `;
-    document.getElementById("weatherResult").innerHTML = weatherInfo;
+    updateWeather(data);
+    saveToHistory(city);
   } else {
-    document.getElementById("weatherResult").innerHTML = `<p>❌ City not found!</p>`;
+    alert("City not found!");
   }
- const condition = data.weather[0].main.toLowerCase();
-document.body.style.background = condition.includes("rain") ? "#aec6cf" :
-                                  condition.includes("cloud") ? "#d3d3d3" :
-                                  condition.includes("clear") ? "#f7e9a0" :
-                                  "#ffffff";
-
 }
+
 async function getWeatherByLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async position => {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-      const apiKey = "5d734ecea5469f4b372578e0252a1a99"; // replace with your real key
       const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
-
       const response = await fetch(url);
       const data = await response.json();
 
       if (data.cod === 200) {
-        const weatherInfo = `
-          <p>📍 <strong>${data.name}, ${data.sys.country}</strong></p>
-          <p>🌡️ Temperature: ${data.main.temp}°C</p>
-          <p>☁️ Condition: ${data.weather[0].main}</p>
-          <p>💧 Humidity: ${data.main.humidity}%</p>
-          <p>🌬️ Wind Speed: ${data.wind.speed} m/s</p>
-        `;
-        document.getElementById("weatherResult").innerHTML = weatherInfo;
+        updateWeather(data);
+        saveToHistory(data.name);
       }
-    }, () => {
-      alert("Unable to retrieve location.");
-    });
+    }, () => alert("Unable to retrieve location."));
   } else {
-    alert("Geolocation not supported by this browser.");
+    alert("Geolocation not supported.");
   }
-const condition = data.weather[0].main.toLowerCase();
-document.body.style.background = condition.includes("rain") ? "#aec6cf" :
-                                  condition.includes("cloud") ? "#d3d3d3" :
-                                  condition.includes("clear") ? "#f7e9a0" :
-                                  "#ffffff";
 }
+
+function updateWeather(data) {
+  const icon = data.weather[0].icon;
+  const condition = data.weather[0].main.toLowerCase();
+
+  const weatherInfo = `
+    <p><strong>${data.name}, ${data.sys.country}</strong></p>
+    <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="icon"/>
+    <p>Temperature: ${data.main.temp}°C</p>
+    <p>Condition: ${data.weather[0].main}</p>
+    <p>Humidity: ${data.main.humidity}%</p>
+    <p>Wind Speed: ${data.wind.speed} m/s</p>
+  `;
+  document.getElementById("weatherResult").innerHTML = weatherInfo;
+
+  // Animated Background
+  if (condition.includes("rain")) {
+    document.body.style.background = "url('https://i.imgur.com/f1vP2cW.gif') no-repeat center center/cover";
+  } else if (condition.includes("cloud")) {
+    document.body.style.background = "url('https://i.imgur.com/0ZgU5xL.gif') no-repeat center center/cover";
+  } else if (condition.includes("clear")) {
+    document.body.style.background = "url('https://i.imgur.com/NM9WvPL.gif') no-repeat center center/cover";
+  } else {
+    document.body.style.background = "linear-gradient(to top, #87cefa, #ffffff)";
+  }
+}
+
+function saveToHistory(city) {
+  let history = JSON.parse(localStorage.getItem("weatherSearchHistory")) || [];
+  if (!history.includes(city)) {
+    history.push(city);
+    localStorage.setItem("weatherSearchHistory", JSON.stringify(history));
+  }
+  displaySearchHistory();
+}
+
+function displaySearchHistory() {
+  const history = JSON.parse(localStorage.getItem("weatherSearchHistory")) || [];
+  let html = "<h3>Recent Searches:</h3><ul>";
+  history.slice(-5).reverse().forEach(city => {
+    html += `<li onclick="searchFromHistory('${city}')">${city}</li>`;
+  });
+  html += "</ul>";
+  document.getElementById("historyBox").innerHTML = html;
+}
+
+function searchFromHistory(city) {
+  document.getElementById("cityInput").value = city;
+  getWeather();
+}
+
+// Load history on page load
+window.onload = displaySearchHistory;
